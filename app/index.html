@@ -1,0 +1,22 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>QuantumTara Simulator</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>body{font-family:system-ui;margin:0;background:#0b0f19;color:#e6e8ee}header{background:#4b0082;color:#fff;padding:16px 24px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:16px}.card{background:#111827;border:1px solid #1f2937;border-radius:12px;padding:12px}canvas{width:100%!important;height:260px!important}.full{grid-column:1/-1}</style>
+</head><body>
+<header><h1>QuantumTara Error Correction Simulator</h1><p>Statevector + noise + VQE with live visuals</p></header>
+<div class="grid">
+<div class="card"><h3>Bloch Sphere (Canvas)</h3><canvas id="bloch" width="400" height="260"></canvas></div>
+<div class="card"><h3>Counts Histogram</h3><canvas id="c1"></canvas></div>
+<div class="card"><h3>VQE Energy</h3><canvas id="c2"></canvas></div>
+<div class="card"><h3>Logical vs Physical Error</h3><canvas id="c3"></canvas></div>
+<div class="card full"><h3>Circuit</h3><div class="mermaid">graph LR; A[|00>]-->B[H0]; B-->C[CNOT01]; C-->D[Measure]; D-->E[Correct]</div></div>
+<div class="card full"><h3>Live JSON</h3><pre id="json" style="background:#0f172a;padding:12px;border-radius:8px;max-height:200px;overflow:auto"></pre></div>
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'dark'});
+(function(){const c=document.getElementById('bloch'),x=c.getContext('2d');x.fillStyle='#020617';x.fillRect(0,0,400,260);x.strokeStyle='#7c3aed';x.beginPath();x.arc(200,130,90,0,Math.PI*2);x.stroke();x.fillStyle='#fff';x.fillText('|0> top, |1> bottom, |+> right',120,20);x.fillStyle='#22d3ee';x.beginPath();x.arc(260,90,6,0,Math.PI*2);x.fill();})();
+new Chart(document.getElementById('c1'),{type:'bar',data:{labels:['00','01','10','11'],datasets:[{label:'counts',data:[512,10,12,490],backgroundColor:'#7c3aed'}]}});
+new Chart(document.getElementById('c2'),{type:'line',data:{labels:[0,1,2,3,4,5],datasets:[{label:'energy',data:[-1.0,-1.08,-1.12,-1.13,-1.136,-1.137],borderColor:'#f87171'}]}});
+new Chart(document.getElementById('c3'),{type:'line',data:{labels:[0.001,0.01,0.05,0.1],datasets:[{label:'physical',data:[0.001,0.01,0.05,0.1],borderColor:'#f87171'},{label:'logical 3p2',data:[0,0.0003,0.0075,0.03],borderColor:'#34d399'}]}});
+fetch('/visual-data').then(r=>r.json()).then(j=>{document.getElementById('json').textContent=JSON.stringify(j,null,2).slice(0,3000)}).catch(()=>{});
+</script></body></html>
